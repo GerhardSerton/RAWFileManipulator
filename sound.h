@@ -17,6 +17,7 @@ private:
     std::unique_ptr<std::vector<T>> soundstream;
     int sampleRate;
     int sizeOfIntN;
+    int maximumSizeOfIntN;
     int channels;
     int NumberOfSamples; //Need a function to calculate this
     int fileByteSize; //Need a function to calculate this
@@ -24,8 +25,8 @@ private:
     std::string outputFile;
 public:
 
-  //Constructors
-  Sound(std::vector<T> soundStream, int sampleRate, std::string soundFile, std::string outputFile, int channels, int sizeOfIntN): sampleRate(sampleRate), soundFile(soundFile), outputFile(outputFile), channels(channels), sizeOfIntN(sizeOfIntN)
+  //--------------------Constructors--------------------
+  Sound(std::vector<T> soundStream, int sampleRate, std::string soundFile, std::string outputFile, int channels, int sizeOfIntN, int maximumSizeOfIntN): sampleRate(sampleRate), soundFile(soundFile), outputFile(outputFile), channels(channels), sizeOfIntN(sizeOfIntN), maximumSizeOfIntN(maximumSizeOfIntN)
   {
     std::unique_ptr<std::vector<T>> temp (new std::vector<T>);
     int count = 0;
@@ -39,12 +40,12 @@ public:
     soundstream = std::move(temp);
   }
 
-  Sound(int sampleRate, std::string soundFile, std::string outputFile, int channels, int sizeOfIntN): sampleRate(sampleRate), soundFile(soundFile), outputFile(outputFile), channels(channels), sizeOfIntN(sizeOfIntN)
+  Sound(int sampleRate, std::string soundFile, std::string outputFile, int channels, int sizeOfIntN, int maximumSizeOfIntN): sampleRate(sampleRate), soundFile(soundFile), outputFile(outputFile), channels(channels), sizeOfIntN(sizeOfIntN), maximumSizeOfIntN(maximumSizeOfIntN)
   {
     importSound();
   }
 
-  Sound(const Sound & rhs): sampleRate(rhs.sampleRate), soundFile(rhs.soundFile), outputFile(rhs.outputFile), channels(rhs.channels), sizeOfIntN(rhs.sizeOfIntN), NumberOfSamples(rhs.NumberOfSamples), fileByteSize(rhs.fileByteSize)
+  Sound(const Sound & rhs): sampleRate(rhs.sampleRate), soundFile(rhs.soundFile), outputFile(rhs.outputFile), channels(rhs.channels), sizeOfIntN(rhs.sizeOfIntN), NumberOfSamples(rhs.NumberOfSamples), fileByteSize(rhs.fileByteSize), maximumSizeOfIntN(rhs.maximumSizeOfIntN)
   {
     std::unique_ptr<std::vector<T>> temp (new std::vector<T>);
     for (auto i = rhs.soundStream->begin(); i != rhs.soundStream->end(); ++i)
@@ -54,12 +55,12 @@ public:
     soundstream = std::move(temp);
   }
 
-  Sound(Sound && rhs): sampleRate(std::move(rhs.sampleRate)), soundFile(std::move(rhs.soundFile)), outputFile(std::move(rhs.outputFile)), channels(std::move(rhs.channels)), sizeOfIntN(std::move(sizeOfIntN)), NumberOfSamples(std::move(rhs.NumberOfSamples)), fileByteSize(std::move(rhs.fileByteSize))
+  Sound(Sound && rhs): sampleRate(std::move(rhs.sampleRate)), soundFile(std::move(rhs.soundFile)), outputFile(std::move(rhs.outputFile)), channels(std::move(rhs.channels)), sizeOfIntN(std::move(sizeOfIntN)), NumberOfSamples(std::move(rhs.NumberOfSamples)), fileByteSize(std::move(rhs.fileByteSize)), maximumSizeOfIntN(std::move(rhs.maximumSizeOfIntN))
   {
     soundstream = std::move(rhs.soundstream);
   }
 
-  //File import and output
+  //--------------------File import and output--------------------
   void importSound()
   {
     std::ifstream loadFile (soundFile, std::ios::in | std::ios::binary);
@@ -101,8 +102,69 @@ public:
     }
     outFile.write((char *)buffer, NumberOfSamples);
     outFile.close();
-
   }
+
+  //--------------------Operators--------------------
+
+  Sound & operator = (const Sound & rhs)
+  {
+    sampleRate = rhs.sampleRate;
+    soundFile = rhs.soundFile;
+    outputFile = rhs.outputFile;
+    channels = rhs.channels;
+    sizeOfIntN = rhs.sizeOfIntN;
+    NumberOfSamples = rhs.NumberOfSamples;
+    fileByteSize = rhs.fileByteSize;
+    maximumSizeOfIntN = rhs.maximumSizeOfIntN;
+
+    std::unique_ptr<std::vector<T>> temp (new std::vector<T>);
+    for (auto i = rhs.soundStream->begin(); i != rhs.soundStream->end(); ++i)
+    {
+      temp->push_back(*i);
+    }
+    soundstream = std::move(temp);
+
+    return *this;
+  }
+
+  Sound & operator = (Sound && rhs)
+  {
+    sampleRate = std::move(rhs.sampleRate);
+    soundFile = std::move(rhs.soundFile);
+    outputFile = std::move(rhs.outputFile);
+    channels = std::move(rhs.channels);
+    sizeOfIntN = std::move(rhs.sizeOfIntN);
+    NumberOfSamples = std::move(rhs.NumberOfSamples);
+    fileByteSize = std::move(rhs.fileByteSize);
+    maximumSizeOfIntN = std::move(rhs.maximumSizeOfIntN);
+    soundstream = std::move(rhs.soundstream);
+
+    return *this;
+  }
+
+  Sound operator + (Sound rhs) //add amplitudes
+  {
+    std::vector<T> temp;
+    auto rhsi = rhs.soundstream->begin();
+    auto thisi = soundstream->begin();
+    while (thisi != soundstream->end())
+    {
+      int op = (int)(*rhsi) + (int)(*thisi);
+      if (op > maximumSizeOfIntN)
+      {
+        op = maximumSizeOfIntN;
+      }
+      else if (op < (0 - maximumSizeOfIntN - 1))
+      {
+        op = (0 - maximumSizeOfIntN - 1);
+      }
+      T final = op;
+      temp.push_back(op);
+    }
+
+    return Sound<T>(temp, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
+  }
+
 
 };
 
