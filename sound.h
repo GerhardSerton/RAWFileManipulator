@@ -48,7 +48,7 @@ public:
   Sound(const Sound & rhs): sampleRate(rhs.sampleRate), soundFile(rhs.soundFile), outputFile(rhs.outputFile), channels(rhs.channels), sizeOfIntN(rhs.sizeOfIntN), NumberOfSamples(rhs.NumberOfSamples), fileByteSize(rhs.fileByteSize), maximumSizeOfIntN(rhs.maximumSizeOfIntN)
   {
     std::unique_ptr<std::vector<T>> temp (new std::vector<T>);
-    for (auto i = rhs.soundStream->begin(); i != rhs.soundStream->end(); ++i)
+    for (auto i = rhs.soundstream->begin(); i != rhs.soundstream->end(); ++i)
     {
       temp->push_back(*i);
     }
@@ -118,7 +118,7 @@ public:
     maximumSizeOfIntN = rhs.maximumSizeOfIntN;
 
     std::unique_ptr<std::vector<T>> temp (new std::vector<T>);
-    for (auto i = rhs.soundStream->begin(); i != rhs.soundStream->end(); ++i)
+    for (auto i = rhs.soundstream->begin(); i != rhs.soundstream->end(); ++i)
     {
       temp->push_back(*i);
     }
@@ -160,10 +160,20 @@ public:
       }
       T final = op;
       temp.push_back(op);
+
+      ++thisi;
+      ++rhsi;
     }
 
     return Sound<T>(temp, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
-  }
+    }
+
+    ////--------------------Methods--------------------
+
+    std::vector<std::int8_t> & returnVector()
+    {
+      return *soundstream;
+    }
 
 
 };
