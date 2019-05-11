@@ -100,3 +100,203 @@ TEST_CASE("+ operator: 8 Bit Mono")
 
   REQUIRE(addResult == resultvec);
 }
+
+TEST_CASE("| Operator: 8 Bit Mono")
+{
+  Sound<std::int8_t> test1(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
+  Sound<std::int8_t> test2(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
+
+  Sound<std::int8_t> result = test1 | test2;
+
+  std::vector<int8_t> resultvec = result.returnVector();
+  std::vector<int8_t> test1vec = test1.returnVector();
+  std::vector<int8_t> test2vec = test2.returnVector();
+
+  std::vector<int8_t> catResult;
+  auto test1i = test1vec.begin();
+  auto test2i = test2vec.begin();
+
+  while (test1i != test1vec.end())
+  {
+    catResult.push_back(*test1i);
+    ++test1i;
+  }
+
+  while (test2i != test2vec.end())
+  {
+    catResult.push_back(*test2i);
+    ++test2i;
+  }
+
+  REQUIRE(catResult == resultvec);
+}
+
+TEST_CASE("* Operator: 8 Bit Mono")
+{
+  Sound<std::int8_t> test1(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
+  float volume = 1.5f;
+
+  Sound<std::int8_t> result = test1 * volume;
+
+  std::vector<int8_t> resultvec = result.returnVector();
+  std::vector<int8_t> test1vec = test1.returnVector();
+
+  std::vector<int8_t> volResult;
+  auto test1i = test1vec.begin();
+  while (test1i != test1vec.end())
+  {
+    float calc = (int)(*test1i) * volume;
+    int c = (int)calc;
+    std::int8_t final = c;
+    volResult.push_back(final);
+    ++test1i;
+  }
+
+  REQUIRE(volResult == resultvec);
+
+}
+
+TEST_CASE("^ Operator: 8 Bit Mono")
+{
+  Sound<std::int8_t> test1(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
+  std::pair<int, int> cut = std::make_pair(20, 80);
+
+  Sound<std::int8_t> result = test1 ^ cut;
+
+  std::vector<int8_t> resultvec = result.returnVector();
+  std::vector<int8_t> test1vec = test1.returnVector();
+
+  std::vector<int8_t> cutResult;
+  auto test1i = test1vec.begin() + cut.first;
+  while (test1i != test1vec.begin() + cut.second)
+  {
+    cutResult.push_back(*test1i);
+    ++test1i;
+  }
+
+  REQUIRE(cutResult == resultvec);
+}
+
+TEST_CASE("rangedAdd Method: 8 Bit Mono")
+{
+  Sound<std::int8_t> test1(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
+  Sound<std::int8_t> test2(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
+  int start = 20;
+  int end = 80;
+
+  Sound<std::int8_t> result = test1.rangedAdd(test2, 20, 80);
+
+  std::vector<int8_t> resultvec = result.returnVector();
+  std::vector<int8_t> test1vec = test1.returnVector();
+  std::vector<int8_t> test2vec = test2.returnVector();
+
+  std::vector<int8_t> radResult;
+  auto test1i = test1vec.begin() + 20;
+  auto test2i = test2vec.begin() + 20;
+
+  while (test1i != test1vec.begin() + 80)
+  {
+    int op = (int)(*test1i) + (int)(*test2i);
+    if (op > 127)
+    {
+      op = 127;
+    }
+    else if (op < -128)
+    {
+      op = -128;
+    }
+    int8_t final = op;
+    radResult.push_back(final);
+
+    ++test1i;
+    ++test2i;
+  }
+
+  auto finali = test1vec.begin() + 20;
+  auto radi = radResult.begin();
+  while (finali != test1vec.begin() + 80)
+  {
+    *finali = *radi;
+    ++finali;
+    ++radi;
+  }
+
+  REQUIRE(test1vec == resultvec);
+
+}
+
+TEST_CASE("reverse Method: 8 Bit Mono")
+{
+  Sound<std::int8_t> test1(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
+
+  Sound<std::int8_t> result = test1.reverse();
+
+  std::vector<int8_t> resultvec = result.returnVector();
+  std::vector<int8_t> test1vec = test1.returnVector();
+
+  std::vector<int8_t> revResult;
+  auto test1i = test1vec.end() - 1;
+  while (test1i != test1vec.begin() - 1)
+  {
+    revResult.push_back(*test1i);
+    --test1i;
+  }
+
+  REQUIRE(revResult == resultvec);
+
+}
+
+TEST_CASE("rms Method: 8 Bit Mono")
+{
+  Sound<std::int8_t> test1(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
+
+  float result = test1.rms();
+
+  std::vector<int8_t> test1vec = test1.returnVector();
+
+  auto test1i = test1vec.begin();
+  float total = 0.0f;
+  while (test1i != test1vec.end())
+  {
+    total += (float)(*test1i);
+    ++test1i;
+  }
+  float avg = total / (float)test1vec.size();
+
+  REQUIRE(avg == result);
+}
+
+TEST_CASE("normalisation Method: 8 Bit Mono")
+{
+  Sound<std::int8_t> test1(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
+  float desiredRms = 1.5;
+  float currentRms = test1.rms();
+
+  Sound<std::int8_t> result = test1.normalisation(desiredRms);
+
+  std::vector<int8_t> resultvec = result.returnVector();
+  std::vector<int8_t> test1vec = test1.returnVector();
+
+  std::vector<int8_t> norResult;
+  auto test1i = test1vec.begin();
+
+  while (test1i != test1vec.end())
+  {
+    float calc = (int)(*test1i) * (desiredRms / currentRms);
+    int op = (int)(calc);
+    if (op > 127)
+    {
+      op = 127;
+    }
+    else if (op < -128)
+    {
+      op = -128;
+    }
+    std::int8_t final = op;
+
+    norResult.push_back(final);
+    ++test1i;
+  }
+
+  REQUIRE(norResult == resultvec);
+}

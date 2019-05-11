@@ -168,11 +168,102 @@ public:
     return Sound<T>(temp, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
     }
 
-    ////--------------------Methods--------------------
+    Sound operator | (Sound rhs) //concatenate
+    {
+      std::vector<T> result;
+      std::copy(soundstream->begin(), soundstream->end(), back_inserter(result));
+      std::copy(rhs.soundstream->begin(), rhs.soundstream->end(), back_inserter(result));
 
+      return Sound<T>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
+    }
+
+    Sound operator * (float rhs) //volume factor
+    {
+      std::vector<T> result;
+      int max = maximumSizeOfIntN;
+      std::transform(soundstream->begin(), soundstream->end(), back_inserter(result), [rhs, max] (T x){
+        int result = (int)((int)(x) * rhs);
+
+        if (result > max)
+        {
+          result = max;
+        }
+        else if (result < (0 - max - 1))
+        {
+          result = (0 - max - 1);
+        }
+
+        T final = result;
+        return final;
+      });
+      return Sound<T>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
+    }
+
+    Sound operator ^ (std::pair<int, int> rhs) //cut
+    {
+      std::vector<T> result;
+      std::copy(soundstream->begin() + rhs.first, soundstream->begin() + rhs.second, back_inserter(result));
+
+      return Sound<T>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
+    }
+
+    //--------------------Methods--------------------
+
+    Sound rangedAdd(Sound rhs, int start, int end)
+    {
+      std::pair<int, int> cut = std::make_pair(start, end);
+      Sound<T> cutResult = (rhs ^ cut) + (*this ^ cut);
+      Sound<T> finalResult(*this);
+      std::copy(cutResult.soundstream->begin(), cutResult.soundstream->end(), finalResult.soundstream->begin() + cut.first);
+
+      return finalResult;
+
+    }
+
+    Sound reverse()
+    {
+      std::vector<T> result = *soundstream;
+      std::reverse(result.begin(), result.end());
+
+      return Sound<T>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
+
+    }
     std::vector<std::int8_t> & returnVector()
     {
       return *soundstream;
+    }
+
+    float rms()
+    {
+      float result = std::accumulate(soundstream->begin(), soundstream->end(), 0.0f);
+      result = result / (float)(fileByteSize);
+      return result;
+    }
+
+    Sound normalisation(float desiredRms)
+    {
+      float currentRms = rms();
+      int max = maximumSizeOfIntN;
+      std::vector<T> result;
+
+      std::transform(soundstream->begin(), soundstream->end(), back_inserter(result), [desiredRms, currentRms, max] (T x) {
+        float result = (float)(x) * (desiredRms / currentRms);
+        int resultInt = (int)result;
+        if (resultInt > max)
+        {
+          resultInt = max;
+        }
+        else if (resultInt < (0 - max - 1))
+        {
+          resultInt = (0 - max - 1);
+        }
+        T final = resultInt;
+
+        return final;
+      });
+
+      return Sound<T>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
+      
     }
 
 
