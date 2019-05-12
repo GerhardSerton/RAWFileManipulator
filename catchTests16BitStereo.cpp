@@ -196,7 +196,7 @@ TEST_CASE("* Operator: 16 Bit Stereo")
 TEST_CASE("^ Operator: 16 Bit Stereo")
 {
   Sound<std::pair<std::int16_t, std::int16_t>> test1(44100, "16bitstereo.raw", "16bitstereotest.raw", 2, 2, 32767);
-  std::pair<int, int> cut = std::make_pair(20, 80);
+  std::pair<float, float> cut = std::make_pair(1.0f, 3.0f);
 
   Sound<std::pair<std::int16_t, std::int16_t>> result = test1 ^ cut;
 
@@ -204,8 +204,10 @@ TEST_CASE("^ Operator: 16 Bit Stereo")
   std::vector<std::pair<std::int16_t, std::int16_t>> test1vec = test1.returnVector();
 
   std::vector<std::pair<std::int16_t, std::int16_t>> cutResult;
-  auto test1i = test1vec.begin() + cut.first;
-  while (test1i != test1vec.begin() + cut.second)
+  int start = (int)(cut.first * 44100.0f);
+  int finish = (int)(cut.second * 44100.0f);
+  auto test1i = test1vec.begin() + start;
+  while (test1i != test1vec.begin() + finish)
   {
     cutResult.push_back(*test1i);
     ++test1i;
@@ -221,16 +223,22 @@ TEST_CASE("rangedAdd Method: 16 Bit Stereo")
   int start = 20;
   int end = 80;
 
-  Sound<std::pair<std::int16_t, std::int16_t>> result = test1.rangedAdd(test2, 20, 80, 40, 100);
+  Sound<std::pair<std::int16_t, std::int16_t>> result = test1.rangedAdd(test2, 3.0f, 6.0f, 1.0f, 4.0f);
   std::vector<std::pair<std::int16_t, std::int16_t>> resultvec = result.returnVector();
   std::vector<std::pair<std::int16_t, std::int16_t>> test1vec = test1.returnVector();
   std::vector<std::pair<std::int16_t, std::int16_t>> test2vec = test2.returnVector();
 
-  std::vector<std::pair<std::int16_t, std::int16_t>> radResult;
-  auto test1i = test1vec.begin() + 20;
-  auto test2i = test2vec.begin() + 40;
+  int start1  = (int)(3.0f * 44100.0f);
+  int finish1  = (int)(6.0f * 44100.0f);
 
-  while (test1i != test1vec.begin() + 80)
+  int start2  = (int)(1.0f * 44100.0f);
+  int finish2  = (int)(4.0f * 44100.0f);
+
+  std::vector<std::pair<std::int16_t, std::int16_t>> radResult;
+  auto test1i = test1vec.begin() + start1;
+  auto test2i = test2vec.begin() + start2;
+
+  while (test1i != test1vec.begin() + finish1)
   {
     std::pair<std::int16_t, std::int16_t> t1p = *test1i;
     std::pair<std::int16_t, std::int16_t> t2p = *test2i;

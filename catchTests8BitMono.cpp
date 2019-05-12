@@ -160,7 +160,7 @@ TEST_CASE("* Operator: 8 Bit Mono")
 TEST_CASE("^ Operator: 8 Bit Mono")
 {
   Sound<std::int8_t> test1(44100, "8bitmono.raw", "8bitmonotest.raw", 1, 1, 127);
-  std::pair<int, int> cut = std::make_pair(20, 80);
+  std::pair<float, float> cut = std::make_pair(1.0f, 3.0f);
 
   Sound<std::int8_t> result = test1 ^ cut;
 
@@ -168,8 +168,10 @@ TEST_CASE("^ Operator: 8 Bit Mono")
   std::vector<int8_t> test1vec = test1.returnVector();
 
   std::vector<int8_t> cutResult;
-  auto test1i = test1vec.begin() + cut.first;
-  while (test1i != test1vec.begin() + cut.second)
+  int start = (int)(cut.first * 44100.0f);
+  int finish = (int)(cut.second * 44100.0f);
+  auto test1i = test1vec.begin() + start;
+  while (test1i != test1vec.begin() + finish)
   {
     cutResult.push_back(*test1i);
     ++test1i;
@@ -185,17 +187,23 @@ TEST_CASE("rangedAdd Method: 8 Bit Mono")
   int start = 20;
   int end = 80;
 
-  Sound<std::int8_t> result = test1.rangedAdd(test2, 20, 80, 40, 100);
+  Sound<std::int8_t> result = test1.rangedAdd(test2, 3.0f, 6.0f, 1.0f, 4.0f);
 
   std::vector<int8_t> resultvec = result.returnVector();
   std::vector<int8_t> test1vec = test1.returnVector();
   std::vector<int8_t> test2vec = test2.returnVector();
 
-  std::vector<int8_t> radResult;
-  auto test1i = test1vec.begin() + 20;
-  auto test2i = test2vec.begin() + 40;
+  int start1  = (int)(3.0f * 44100.0f);
+  int finish1  = (int)(6.0f * 44100.0f);
 
-  while (test1i != test1vec.begin() + 80)
+  int start2  = (int)(1.0f * 44100.0f);
+  int finish2  = (int)(4.0f * 44100.0f);
+
+  std::vector<int8_t> radResult;
+  auto test1i = test1vec.begin() + start1;
+  auto test2i = test2vec.begin() + start2;
+
+  while (test1i != test1vec.begin() + finish1)
   {
     int op = (int)(*test1i) + (int)(*test2i);
     if (op > 127)

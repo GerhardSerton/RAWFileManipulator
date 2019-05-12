@@ -200,20 +200,20 @@ public:
       return Sound<T>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
     }
 
-    Sound operator ^ (std::pair<int, int> rhs) //cut
+    Sound operator ^ (std::pair<float, float> rhs) //cut
     {
       std::vector<T> result;
-      std::copy(soundstream->begin() + rhs.first, soundstream->begin() + rhs.second, back_inserter(result));
+      std::copy(soundstream->begin() + convertFromSeconds(rhs.first), soundstream->begin() + convertFromSeconds(rhs.second), back_inserter(result));
 
       return Sound<T>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
     }
 
     //--------------------Methods--------------------
 
-    Sound rangedAdd(Sound rhs, int start, int end, int rstart, int rend)
+    Sound rangedAdd(Sound rhs, float start, float end, float rstart, float rend)
     {
-      std::pair<int, int> cut = std::make_pair(start, end);
-      std::pair<int, int> rcut = std::make_pair(rstart, rend);
+      std::pair<float, float> cut = std::make_pair(start, end);
+      std::pair<float, float> rcut = std::make_pair(rstart, rend);
       Sound<T> cutResult = (*this ^ cut) + (rhs ^ rcut);
       //Sound<T> finalResult(*this);
       //std::copy(cutResult.soundstream->begin(), cutResult.soundstream->end(), finalResult.soundstream->begin() + cut.first);
@@ -275,6 +275,12 @@ public:
 
       return Sound<T>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
 
+    }
+
+    int convertFromSeconds(float seconds)
+    {
+      int result = (int)(sampleRate * seconds);
+      return result;
     }
 
 
@@ -500,10 +506,10 @@ public:
     return Sound<std::pair<T, T>>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
   }
 
-  Sound operator ^ (std::pair<int, int> rhs) //cut
+  Sound operator ^ (std::pair<float, float> rhs) //cut
   {
     std::vector<std::pair<T, T>> result;
-    std::copy(soundstream->begin() + rhs.first, soundstream->begin() + rhs.second, back_inserter(result));
+    std::copy(soundstream->begin() + convertFromSeconds(rhs.first), soundstream->begin() + convertFromSeconds(rhs.second), back_inserter(result));
 
     return Sound<std::pair<T, T>>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
   }
@@ -515,10 +521,10 @@ public:
     return *soundstream;
   }
 
-  Sound rangedAdd(Sound rhs, int start, int end, int rstart, int rend)
+  Sound rangedAdd(Sound rhs, float start, float end, float rstart, float rend)
   {
-    std::pair<int, int> cut = std::make_pair(start, end);
-    std::pair<int, int> rcut = std::make_pair(rstart, rend);
+    std::pair<float, float> cut = std::make_pair(start, end);
+    std::pair<float, float> rcut = std::make_pair(rstart, rend);
     Sound<std::pair<T, T>> cutResult = (*this ^ cut) + (rhs ^ rcut);
     /**
     Sound<std::pair<T, T>> finalResult(*this);
@@ -605,6 +611,12 @@ public:
 
     return Sound<std::pair<T, T>>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
 
+  }
+
+  int convertFromSeconds(float seconds)
+  {
+    int result = (int)(sampleRate * seconds);
+    return result;
   }
 };
 
