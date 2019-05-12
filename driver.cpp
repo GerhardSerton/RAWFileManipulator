@@ -16,19 +16,16 @@ int main(int argc, char * argv[])
 		channelsString = "STEREO";
 	}
 	string outName = "out";
-	string argument;
-	if (argv[7] == "-o")
+	string argument = argv[7];
+	if (argument == "-o")
 	{
 		outName = argv[8];
 		argument = argv[9];
 	}
-	else
-	{
-		argument = argv[7];
-	}
 	string outNameFinal;
 	outNameFinal = outName + "_" + to_string(sampleRate) + "_" + bitCountString + "_" + channelsString + ".raw";
 	cout << "Outputting to: " << outNameFinal << "\n";
+	cout << "Argument: " << argument << "\n";
 
 
 	if (argument == "-add")
@@ -288,6 +285,7 @@ int main(int argc, char * argv[])
 	else if (argument == "-rms")
 	{
 		string soundFile1 = argv[8];
+		cout << "File: " << soundFile1 << "\n";
 		if (channels == 1)
 		{
 			if (bitCount == 1)
