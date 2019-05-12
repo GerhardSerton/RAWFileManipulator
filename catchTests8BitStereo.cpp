@@ -148,7 +148,7 @@ TEST_CASE("| Operator: 8 Bit Stereo")
 TEST_CASE("* Operator: 8 Bit Stereo")
 {
   Sound<std::pair<std::int8_t, std::int8_t>> test1(44100, "8bitstereo.raw", "8bitstereotest.raw", 2, 1, 127);
-  float volume = 1.5f;
+  std::pair<float, float> volume = std::make_pair(1.5f, 3.0f);
 
   Sound<std::pair<std::int8_t, std::int8_t>> result = test1 * volume;
 
@@ -161,8 +161,8 @@ TEST_CASE("* Operator: 8 Bit Stereo")
   {
     std::pair<std::int8_t, std::int8_t> t1p = *test1i;
 
-    float lf = (float)(t1p.first) * volume;
-    float rf = (float)(t1p.second) * volume;
+    float lf = (float)(t1p.first) * volume.first;
+    float rf = (float)(t1p.second) * volume.second;
 
     if (lf > 127.0f)
     {

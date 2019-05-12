@@ -147,7 +147,7 @@ TEST_CASE("| Operator: 16 Bit Stereo")
 TEST_CASE("* Operator: 16 Bit Stereo")
 {
   Sound<std::pair<std::int16_t, std::int16_t>> test1(44100, "16bitstereo.raw", "16bitstereotest.raw", 2, 2, 32767);
-  float volume = 1.5f;
+  std::pair<float, float> volume = std::make_pair(1.5f, 3.0f);
 
   Sound<std::pair<std::int16_t, std::int16_t>> result = test1 * volume;
 
@@ -160,8 +160,8 @@ TEST_CASE("* Operator: 16 Bit Stereo")
   {
     std::pair<std::int16_t, std::int16_t> t1p = *test1i;
 
-    float lf = (float)(t1p.first) * volume;
-    float rf = (float)(t1p.second) * volume;
+    float lf = (float)(t1p.first) * volume.first;
+    float rf = (float)(t1p.second) * volume.second;
 
     if (lf > 32767.0f)
     {

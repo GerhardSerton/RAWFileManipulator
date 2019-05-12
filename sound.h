@@ -464,13 +464,13 @@ public:
     return Sound<std::pair<T, T>>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
   }
 
-  Sound operator * (float rhs) //volume factor
+  Sound operator * (std::pair<float, float> rhs) //volume factor
   {
     std::vector<std::pair<T, T>> result;
     int max = maximumSizeOfIntN;
     std::transform(soundstream->begin(), soundstream->end(), back_inserter(result), [rhs, max] (std::pair<T, T> x) {
-      int left = (int)((int)(x.first) * rhs);
-      int right = (int)((int)(x.second) * rhs);
+      int left = (int)((int)(x.first) * rhs.first);
+      int right = (int)((int)(x.second) * rhs.second);
 
       if (left > max)
       {
