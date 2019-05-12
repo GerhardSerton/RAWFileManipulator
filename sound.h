@@ -210,14 +210,17 @@ public:
 
     //--------------------Methods--------------------
 
-    Sound rangedAdd(Sound rhs, int start, int end)
+    Sound rangedAdd(Sound rhs, int start, int end, int rstart, int rend)
     {
       std::pair<int, int> cut = std::make_pair(start, end);
-      Sound<T> cutResult = (rhs ^ cut) + (*this ^ cut);
-      Sound<T> finalResult(*this);
-      std::copy(cutResult.soundstream->begin(), cutResult.soundstream->end(), finalResult.soundstream->begin() + cut.first);
+      std::pair<int, int> rcut = std::make_pair(rstart, rend);
+      Sound<T> cutResult = (*this ^ cut) + (rhs ^ rcut);
+      //Sound<T> finalResult(*this);
+      //std::copy(cutResult.soundstream->begin(), cutResult.soundstream->end(), finalResult.soundstream->begin() + cut.first);
 
-      return finalResult;
+      //return finalResult;
+
+      return cutResult;
 
     }
 
@@ -512,14 +515,18 @@ public:
     return *soundstream;
   }
 
-  Sound rangedAdd(Sound rhs, int start, int end)
+  Sound rangedAdd(Sound rhs, int start, int end, int rstart, int rend)
   {
     std::pair<int, int> cut = std::make_pair(start, end);
-    Sound<std::pair<T, T>> cutResult = (rhs ^ cut) + (*this ^ cut);
+    std::pair<int, int> rcut = std::make_pair(rstart, rend);
+    Sound<std::pair<T, T>> cutResult = (*this ^ cut) + (rhs ^ rcut);
+    /**
     Sound<std::pair<T, T>> finalResult(*this);
     std::copy(cutResult.soundstream->begin(), cutResult.soundstream->end(), finalResult.soundstream->begin() + cut.first);
 
     return finalResult;
+    */
+    return cutResult;
   }
 
   Sound reverse()

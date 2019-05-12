@@ -221,14 +221,14 @@ TEST_CASE("rangedAdd Method: 16 Bit Stereo")
   int start = 20;
   int end = 80;
 
-  Sound<std::pair<std::int16_t, std::int16_t>> result = test1.rangedAdd(test2, 20, 80);
+  Sound<std::pair<std::int16_t, std::int16_t>> result = test1.rangedAdd(test2, 20, 80, 40, 100);
   std::vector<std::pair<std::int16_t, std::int16_t>> resultvec = result.returnVector();
   std::vector<std::pair<std::int16_t, std::int16_t>> test1vec = test1.returnVector();
   std::vector<std::pair<std::int16_t, std::int16_t>> test2vec = test2.returnVector();
 
   std::vector<std::pair<std::int16_t, std::int16_t>> radResult;
   auto test1i = test1vec.begin() + 20;
-  auto test2i = test2vec.begin() + 20;
+  auto test2i = test2vec.begin() + 40;
 
   while (test1i != test1vec.begin() + 80)
   {
@@ -263,7 +263,7 @@ TEST_CASE("rangedAdd Method: 16 Bit Stereo")
     ++test1i;
     ++test2i;
   }
-
+  /**
   auto finali = test1vec.begin() + 20;
   auto radi = radResult.begin();
   while (radi != radResult.end())
@@ -274,6 +274,9 @@ TEST_CASE("rangedAdd Method: 16 Bit Stereo")
   }
 
   REQUIRE(test1vec == resultvec);
+  */
+
+  REQUIRE(radResult == resultvec);
 }
 
 TEST_CASE("reverse Method: 16 Bit Stereo")

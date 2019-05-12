@@ -185,7 +185,7 @@ TEST_CASE("rangedAdd Method: 8 Bit Mono")
   int start = 20;
   int end = 80;
 
-  Sound<std::int8_t> result = test1.rangedAdd(test2, 20, 80);
+  Sound<std::int8_t> result = test1.rangedAdd(test2, 20, 80, 40, 100);
 
   std::vector<int8_t> resultvec = result.returnVector();
   std::vector<int8_t> test1vec = test1.returnVector();
@@ -193,7 +193,7 @@ TEST_CASE("rangedAdd Method: 8 Bit Mono")
 
   std::vector<int8_t> radResult;
   auto test1i = test1vec.begin() + 20;
-  auto test2i = test2vec.begin() + 20;
+  auto test2i = test2vec.begin() + 40;
 
   while (test1i != test1vec.begin() + 80)
   {
@@ -212,7 +212,7 @@ TEST_CASE("rangedAdd Method: 8 Bit Mono")
     ++test1i;
     ++test2i;
   }
-
+  /**
   auto finali = test1vec.begin() + 20;
   auto radi = radResult.begin();
   while (finali != test1vec.begin() + 80)
@@ -223,6 +223,9 @@ TEST_CASE("rangedAdd Method: 8 Bit Mono")
   }
 
   REQUIRE(test1vec == resultvec);
+  */
+
+  REQUIRE(radResult == resultvec);
 
 }
 
