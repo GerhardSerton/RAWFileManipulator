@@ -557,15 +557,15 @@ public:
     return std::make_pair(resultLeft, resultRight);
   }
 
-  Sound normalisation(float desiredRms)
+  Sound normalisation(std::pair<float, float> desiredRms)
   {
     std::pair<float, float> currentRms = rms();
     int max = maximumSizeOfIntN;
     std::vector<std::pair<T, T>> result;
 
     std::transform(soundstream->begin(), soundstream->end(), back_inserter(result), [desiredRms, currentRms, max] (std::pair<T, T> x) {
-      float leftFloat = (float)(x.first) * (desiredRms / currentRms.first);
-      float rightFloat = (float)(x.second) * (desiredRms / currentRms.second);
+      float leftFloat = (float)(x.first) * (desiredRms.first / currentRms.first);
+      float rightFloat = (float)(x.second) * (desiredRms.second / currentRms.second);
 
       int left = (int)(leftFloat);
       int right = (int)(rightFloat);

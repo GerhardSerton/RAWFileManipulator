@@ -325,7 +325,7 @@ TEST_CASE("rms Method: 8 Bit Stereo")
 TEST_CASE("normalisation Method: 8 Bit Stereo")
 {
   Sound<std::pair<std::int8_t, std::int8_t>> test1(44100, "8bitstereo.raw", "8bitstereotest.raw", 2, 1, 127);
-  float desiredRms = 1.5;
+  std::pair<float, float> desiredRms = std::make_pair(1.5f, 3.0f);
   std::pair<float, float> currentRms = test1.rms();
 
   Sound<std::pair<std::int8_t, std::int8_t>> result = test1.normalisation(desiredRms);
@@ -339,8 +339,8 @@ TEST_CASE("normalisation Method: 8 Bit Stereo")
   while (test1i != test1vec.end())
   {
     std::pair<std::int8_t, std::int8_t> p = *test1i;
-    float leftFloat = (float)(p.first) * (desiredRms / currentRms.first);
-    float rightFloat = (float)(p.second) * (desiredRms / currentRms.second);
+    float leftFloat = (float)(p.first) * (desiredRms.first / currentRms.first);
+    float rightFloat = (float)(p.second) * (desiredRms.second / currentRms.second);
 
     int left = (int)(leftFloat);
     int right = (int)(rightFloat);
