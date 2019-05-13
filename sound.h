@@ -256,7 +256,7 @@ public:
       float currentRms = rms();
       int max = maximumSizeOfIntN;
       std::vector<T> result;
-
+      /**
       std::transform(soundstream->begin(), soundstream->end(), back_inserter(result), [desiredRms, currentRms, max] (T x) {
         float result = (float)(x) * (desiredRms / currentRms);
         int resultInt = (int)result;
@@ -272,6 +272,37 @@ public:
 
         return final;
       });
+      */
+      class normFunct
+      {
+      public:
+        float desiredRms, currentRms;
+        int max;
+
+        normFunct(float desiredRms, float currentRms, int max): desiredRms(desiredRms), currentRms(currentRms), max(max)
+        {}
+
+        T operator () (T x)
+        {
+          float result = (float)(x) * (desiredRms / currentRms);
+          int resultInt = (int)result;
+          if (resultInt > max)
+          {
+            resultInt = max;
+          }
+          else if (resultInt < (0 - max - 1))
+          {
+            resultInt = (0 - max - 1);
+          }
+          T final = resultInt;
+
+          return final;
+        }
+      };
+
+
+      std::transform(soundstream->begin(), soundstream->end(), back_inserter(result), normFunct(desiredRms, currentRms, max));
+
 
       return Sound<T>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
 
@@ -279,12 +310,13 @@ public:
 
     int convertFromSeconds(float seconds)
     {
-      int result = (int)(sampleRate * seconds);
-      return result;
+      float result = (float)sampleRate * seconds;
+      return (int)(result);
     }
 
 
 };
+
 
 template<typename T> class Sound<std::pair<T, T>>
 {
@@ -576,6 +608,50 @@ public:
     int max = maximumSizeOfIntN;
     std::vector<std::pair<T, T>> result;
 
+    class normFunct
+    {
+    public:
+      std::pair<float, float> desiredRms, currentRms;
+      int max;
+
+      normFunct(std::pair<float, float> desiredRms, std::pair<float, float> currentRms, int max): desiredRms(desiredRms), currentRms(currentRms), max(max)
+      {}
+
+      std::pair<T, T> operator () (std::pair<T, T> x)
+      {
+        float leftFloat = (float)(x.first) * (desiredRms.first / currentRms.first);
+        float rightFloat = (float)(x.second) * (desiredRms.second / currentRms.second);
+
+        int left = (int)(leftFloat);
+        int right = (int)(rightFloat);
+
+        if (left > max)
+        {
+          left = max;
+        }
+        else if (left < (0 - max - 1))
+        {
+          left = (0 - max - 1);
+        }
+
+        if (right > max)
+        {
+          right = max;
+        }
+        else if (right < (0 - max - 1))
+        {
+          right = (0 - max - 1);
+        }
+
+        T l = left;
+        T r = right;
+
+        std::pair<T, T> final = std::make_pair(l, r);
+
+        return final;
+      }
+    };
+    /**
     std::transform(soundstream->begin(), soundstream->end(), back_inserter(result), [desiredRms, currentRms, max] (std::pair<T, T> x) {
       float leftFloat = (float)(x.first) * (desiredRms.first / currentRms.first);
       float rightFloat = (float)(x.second) * (desiredRms.second / currentRms.second);
@@ -608,6 +684,8 @@ public:
 
       return final;
     });
+    */
+    std::transform(soundstream->begin(), soundstream->end(), back_inserter(result), normFunct(desiredRms, currentRms, max));
 
     return Sound<std::pair<T, T>>(result, sampleRate, soundFile, outputFile, channels, sizeOfIntN, maximumSizeOfIntN);
 
@@ -615,11 +693,10 @@ public:
 
   int convertFromSeconds(float seconds)
   {
-    int result = (int)(sampleRate * seconds);
-    return result;
+    float result = (float)sampleRate * seconds;
+    return (int)(result);
   }
 };
-
 
 
 
