@@ -75,7 +75,7 @@ int main(int argc, char * argv[])
 	else if (argument == "-cut")
 	{
 		string soundFile1 = argv[12];
-		pair<int, int> cut = make_pair(stoi(argv[10]), stoi(argv[11]));
+		pair<int, int> cut = make_pair(stoi(argv[10]) * 10, stoi(argv[11]) * 10);
 		if (channels == 1)
 		{
 			if (bitCount == 1)
@@ -115,10 +115,10 @@ int main(int argc, char * argv[])
 	{
 		string soundFile1 = argv[14];
 		string soundFile2 = argv[15];
-		int start1 = stoi(argv[10]);
-		int end1 = stoi(argv[11]);
-		int start2 = stoi(argv[12]);
-		int end2 = stoi(argv[13]);
+		int start1 = stoi(argv[10]) * 10;
+		int end1 = stoi(argv[11]) * 10;
+		int start2 = stoi(argv[12]) * 10;
+		int end2 = stoi(argv[13]) * 10;
 
 		if (channels == 1)
 		{
