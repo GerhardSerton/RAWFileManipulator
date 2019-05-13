@@ -6,7 +6,8 @@ To compile this program, simply run "make" to crate an executable named "Driver"
 
 "CatchTests" Instructions:
         Simply run an executable to run the tests it contains. Make sure that "8bitmono.raw", "8bitstereo.raw", "16bitmono.raw", and "16bitstereo.raw" are in the
-        same directory as the executables, as they are required by the unit tests.
+        same directory as the executables, as they are required by the unit tests. These files can be replaced with different files under the same name, in order
+        to run tests using different files.
         for the tests.
 
 "Driver" Instructions:
